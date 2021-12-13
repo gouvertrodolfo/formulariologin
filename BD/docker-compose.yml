@@ -1,0 +1,28 @@
+# Use root/example as user/password credentials
+version: '3.1'
+
+services:
+
+  db:
+    image: mariadb
+    environment:
+      MARIADB_ROOT_PASSWORD: 1234
+      MARIADB_DATABASE: 'node'
+      MARIADB_USER: 'user'
+      MARIADB_PASSWORD: 1234
+    ports:
+      - 3306:3306      
+    volumes:
+      - ./mariadb/data:/var/lib/mysql
+
+  mongodb:
+    container_name: mongodb
+    image: mongo
+    restart: always
+    ports:
+    - 27017:27017    
+    volumes:
+      - ./mongo:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: 1234
