@@ -8,10 +8,13 @@ const inventario =new Contenedor('productos.txt')
 /* -------------------------------------- */
 
 webProductos.get("/", async (req,res)=>{
+
     let items = await inventario.getAll()
     const title = 'Productos'
-
-     res.render('pages/index', { titulo:title , productos:items})
+   
+    const user= req.session.user;
+console.log(user)
+    res.render('pages/index', {user:user, titulo:title , productos:items})
 })
 
 webProductos.post("/productos", async (req, res) => {

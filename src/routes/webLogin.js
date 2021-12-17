@@ -15,16 +15,11 @@ webLogin.get("/", (req, res) => {
 webLogin.post("/", async (req, res) => {
     const { usuario: correo, clave } = req.body
     
-    console.log(correo, clave)
     const [user] = await usuariosBD.listarPorCorreo(correo)
 
-    console.log('user', user)
     if(user)
     {
-        console.log('user encontrado')
-        console.log(user.clave, clave)
         if(user.clave == clave){
-            console.log('eureka')
             req.session.user = user
         }
     }
@@ -43,9 +38,23 @@ webLogin.post("/registro", (req, res) => {
 
     usuariosBD.guardar(usuario)
 
-    res.redirect('/')
+    req.session.user = user
 
+    res.redirect('/')
 })
 
+
+webLogin.get("/logout", (req, res) => {
+    const user = req.session.user
+
+    req.session.destroy(err => {
+        if (err) {
+          res.json({ status: 'Logout ERROR', body: err })
+        } else {
+            res.render('pages/bye',{user: user})
+        }
+
+    })
+})
 
 exports.webLogin = webLogin;

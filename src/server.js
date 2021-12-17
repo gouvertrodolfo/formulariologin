@@ -36,13 +36,6 @@ app.set('view engine', 'ejs')
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-//espacio de rutas
-app.use('/api/productos', apiProductos)
-app.use('/api/productosTest', apiProductosTest)
-
-app.use('/', webProductos)
-app.use('/test', webProductosTest)
-
 /**************************************************************************************** */
 const MongoStore = require('connect-mongo')
 const advancedOptions = { useNewUrlParser: true, useUnifiedTopology: true }
@@ -59,13 +52,21 @@ app.use(session({
     /* ----------------------------------------------------- */
 
     secret: 'shhhhhhhhhhhhhhhhhhhhh',
-    resave: false,
+    resave: true,
     saveUninitialized: false ,
     cookie: {
-        maxAge: 40000
+        maxAge: 600000
     } 
 }))
 
+/**************************************************************************************** */
+
+//espacio de rutas
+app.use('/api/productos', apiProductos)
+app.use('/api/productosTest', apiProductosTest)
+
+app.use('/', webProductos)
+app.use('/test', webProductosTest)
 app.use('/login', webLogin)
 
 /**************************************************************************************** */
@@ -103,9 +104,11 @@ io.on('connection', async socket => {
 
     /* Escucho los mensajes enviado por el cliente y se los propago a todos */
     socket.on('nuevoMensaje', async data => {
-        
+
         mensajes = await chat.AddMensaje(data)
-        io.sockets.emit('mensajes',  mensajes)
+        const mensajes_normal = normalizr.normalize(mensajes, mensajes_schema)
+
+        io.sockets.emit('mensajes',  mensajes_normal)
     })
 
     /* Escucho los nuevos productos enviado por el cliente y se los propago a todos */
