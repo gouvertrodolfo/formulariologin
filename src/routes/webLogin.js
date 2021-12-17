@@ -1,42 +1,51 @@
 const { Router } = require('express');
-//const session = require('express-session')
 const webLogin = Router();
+
+
+const ContenedorUsuarios = require('../daos/ContenedorUsuarios')
+const usuariosBD = new ContenedorUsuarios()
+
 
 webLogin.get("/", (req, res) => {
     const title = 'Login'
+    console.log(req.session.user)
     res.render('pages/login', { titulo: title })
 })
 
-webLogin.post("/", (req, res) => {
-    console.log(req.body)
-    console.log(req.session)
+webLogin.post("/", async (req, res) => {
+    const { usuario: correo, clave } = req.body
+    
+    console.log(correo, clave)
+    const [user] = await usuariosBD.listarPorCorreo(correo)
 
-    if (req.session.usuario) { req.session.usuario = req.body }
-    else { req.session.usuario = req.body }
+    console.log('user', user)
+    if(user)
+    {
+        console.log('user encontrado')
+        console.log(user.clave, clave)
+        if(user.clave == clave){
+            console.log('eureka')
+            req.session.user = user
+        }
+    }
 
     res.redirect('/')
 
 })
 
-
-webLogin.get('/info', (req, res) => {
-    console.log('------------ req.session -------------')
-    console.log(req.session)
-    console.log('--------------------------------------')
-
-    console.log('----------- req.sessionID ------------')
-    console.log(req.sessionID)
-    console.log('--------------------------------------')
-
-    console.log('----------- req.cookies ------------')
-    console.log(req.cookies)
-    console.log('--------------------------------------')
-
-    console.log('---------- req.sessionStore ----------')
-    console.log(req.sessionStore)
-    console.log('--------------------------------------')
-
-    res.send('Send info ok!')
+webLogin.get("/registro", (req, res) => {
+    res.render('pages/registro')
 })
+
+webLogin.post("/registro", (req, res) => {
+
+    let usuario = req.body
+
+    usuariosBD.guardar(usuario)
+
+    res.redirect('/')
+
+})
+
 
 exports.webLogin = webLogin;

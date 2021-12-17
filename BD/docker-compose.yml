@@ -3,8 +3,9 @@ version: '3.1'
 
 services:
 
-  db:
+  mariadb:
     image: mariadb
+    container_name: mariadb
     environment:
       MARIADB_ROOT_PASSWORD: 1234
       MARIADB_DATABASE: 'node'
@@ -16,13 +17,12 @@ services:
       - ./mariadb/data:/var/lib/mysql
 
   mongodb:
-    container_name: mongodb
     image: mongo
-    restart: always
-    ports:
-    - 27017:27017    
-    volumes:
-      - ./mongo:/data/db
+    container_name: mongodb
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: 1234
+    ports:
+      - 27017:27017    
+    volumes:
+      - ./mongo:/data/db

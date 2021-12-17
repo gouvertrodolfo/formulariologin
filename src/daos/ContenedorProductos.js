@@ -4,7 +4,36 @@ const knex = require('knex')(options)
 class ContenedorProductos {
 
     constructor() {
+        this.crearTabla();
         this.listaproductos = []
+    }
+
+    async crearTabla() {
+        
+        try {
+
+            await knex.schema.hasTable('productos').then(function (exists) {
+                if (!exists) {
+
+                    knex.schema.createTable('productos', table => {
+                        table.increments()
+                        table.string('title')
+                        table.string('price')
+                        table.string('thumbnail')   
+                    })
+                        .then(console.log("tabla productos creada"))
+                        .catch((err) => { console.log(err); throw err })
+                        .finally(() => { knex.destroy() })
+            
+
+                    console.log('Tabla productos creada!');
+                }
+                else
+                {console.log('La tabla productos ya existe!');}
+            })
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     async init() {

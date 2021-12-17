@@ -1,15 +1,14 @@
 
 const socket = io.connect();
 
+
+
 function addMessage(e) {
+
+    console.log(session.user)
+    
     const mensaje = {
-        author: {
-            correo: document.getElementById('correo').value,
-            nombre: document.getElementById('nombre').value,
-            apellido: document.getElementById('apellido').value,
-            edad: document.getElementById('edad').value,
-            alias: document.getElementById('alias').value,
-        },
+        author: session.user,
         text: document.getElementById('texto').value
     };
     document.getElementById('texto').value = ''
@@ -28,18 +27,20 @@ function addProducto(prd) {
 }
 
 socket.on('mensajes', async msjs => {
+/*********************************************************************************** */
+const schema = normalizr.schema;
+const author_schema = new schema.Entity('author',{},{idAttribute:'correo'});
 
-    const schema = normalizr.schema;
+// Definimos un esquema de mensaje
+const mensaje_schema = new schema.Entity('mensaje', {
+    author: author_schema
+  },{idAttribute:'_id'});
 
-    const author_schema = new schema.Entity('author',{},{idAttribute:'correo'});
+// Definimos un esquema de mensaje
+const mensajes_schema = new schema.Array(mensaje_schema);
 
-    // Definimos un esquema de mensaje
-    const mensaje_schema = new schema.Entity('mensaje', {
-        author: author_schema
-      },{idAttribute:'_id'});
-    
-    // Definimos un esquema de mensaje
-    const mensajes_schema = new schema.Array(mensaje_schema);
+/*********************************************************************************** */
+
 
     const mensajes = normalizr.denormalize(msjs.result, mensajes_schema, msjs.entities)
 

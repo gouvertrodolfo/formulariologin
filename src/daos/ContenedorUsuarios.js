@@ -26,6 +26,7 @@ class ContenedorUsuarios {
 
                     console.log('Tabla usuarios creada!');
                 }
+                else{console.log('Tabla usuarios ya existe!');}
             })
         } catch (error) {
             console.log(error);

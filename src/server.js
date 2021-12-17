@@ -6,7 +6,7 @@ const { apiProductos } = require("./routes/apiProductos")
 const { apiProductosTest } = require("./routes/apiProductosTest")
 const { webProductos } = require("./routes/webProductos")
 const { webProductosTest } = require("./routes/webProductosTest")
-// const { webLogin } = require("./routes/webLogin")
+const { webLogin } = require("./routes/webLogin")
 
 /**************************************************************************************** */
 const { Server: HttpServer } = require('http')
@@ -16,10 +16,6 @@ const { Server: IOServer } = require('socket.io')
 const Contenedor = require('./daos/ContenedorProductos')
 const inventario = new Contenedor('productos.txt')
 
-/**************************************************************************************** */
-
-const ContenedorUsuarios = require('./daos/ContenedorUsuarios')
-const usuariosBD = new ContenedorUsuarios()
 
 /**************************************************************************************** */
 const Chat = require('./daos/ContenedorMensajes')
@@ -46,7 +42,6 @@ app.use('/api/productosTest', apiProductosTest)
 
 app.use('/', webProductos)
 app.use('/test', webProductosTest)
-// app.use('/login', webLogin)
 
 /**************************************************************************************** */
 const MongoStore = require('connect-mongo')
@@ -54,7 +49,7 @@ const advancedOptions = { useNewUrlParser: true, useUnifiedTopology: true }
 
 app.use(session({
     /* ----------------------------------------------------- */
-    /*           Persistencia por redis database             */
+    /*           Persistencia por mongo altlas database             */
     /* ----------------------------------------------------- */
     store: MongoStore.create({
         //En Atlas connect App :  Make sure to change the node version to 2.2.12:
@@ -71,48 +66,7 @@ app.use(session({
     } 
 }))
 
-app.get("/login", (req, res) => {
-    const title = 'Login'
-    console.log(req.session.usuario)
-    res.render('pages/login', { titulo: title })
-})
-
-app.post("/login", async (req, res) => {
-    const { usuario, clave } = req.body
-    
-    console.log('usuario, clave')
-    console.log(usuario, clave)
-    const user = await usuariosBD.listarPorCorreo(usuario)
-
-    console.log('user', user)
-    if(user)
-    {
-        console.log('user encontrado')
-        if(user.clave == clave){
-            console.log('eureka')
-            req.session.user = user
-        }
-    }
-
-    res.redirect('/')
-
-})
-
-app.get("/login/registro", (req, res) => {
-    res.render('pages/registro')
-})
-
-app.post("/login/registro", (req, res) => {
-
-    let usuario = req.body
-
-    usuariosBD.guardar(usuario)
-
-    res.redirect('/')
-
-})
-
-
+app.use('/login', webLogin)
 
 /**************************************************************************************** */
 
